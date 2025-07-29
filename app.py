@@ -16,8 +16,8 @@ import joblib
 from typing import Dict, List, Set, Any  # ADDED IMPORT
 
 # Set Tesseract path - UPDATE THIS TO YOUR ACTUAL TESSERACT PATH
-TESSERACT_PATH = r"C:\Program Files\Tesseract-OCR\tesseract.exe"  # Windows example
-pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
+#TESSERACT_PATH = r"C:\Program Files\Tesseract-OCR\tesseract.exe"  # Windows example
+#pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
 
 # Load NLP model
 
@@ -297,7 +297,7 @@ class MedicalReportProcessor:
 
         return output
     
-POPPLER_PATH = r"C:\Users\VRINDA\Downloads\Release-23.11.0-0\poppler-23.11.0\Library\bin"
+#POPPLER_PATH = r"C:\Users\VRINDA\Downloads\Release-23.11.0-0\poppler-23.11.0\Library\bin"
 
 class DocumentProcessor:
     @staticmethod
