@@ -6,7 +6,7 @@ colorTo: blue
 sdk: streamlit  
 app_file: app.py
 pinned: false
-short_description: Analyze medical reports to assess insurance risk and loan eligible.
+short_description: Medical Report Analyzer:Assess insurance risk & loan eligibe
 ---
 
 # 🏥 Medical Loan Helper
