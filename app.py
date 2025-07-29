@@ -28,6 +28,19 @@ import spacy
 import subprocess
 import sys
 
+
+import os
+import pytesseract
+
+# Set Tesseract path explicitly for Hugging Face
+pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+
+# Verify Tesseract installation
+if not os.path.exists(pytesseract.pytesseract.tesseract_cmd):
+    raise RuntimeError(
+        f"Tesseract not found at {pytesseract.pytesseract.tesseract_cmd}. "
+        "Please check your apt.txt configuration."
+    )
 # Check if model is already installed, if not, install it
 try:
     nlp = spacy.load("en_core_web_sm")
