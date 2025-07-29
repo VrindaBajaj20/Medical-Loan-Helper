@@ -322,26 +322,24 @@ class DocumentProcessor:
     @staticmethod
     def extract_text(uploaded_file):
         try:
-            # First try direct text extraction with PyMuPDF
-            with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
-                text = "\n".join([page.get_text() for page in doc])
-                if text.strip():
-                    return text
+            doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
+            text = ""
+            
+            # Try text extraction first
+            for page in doc:
+                text += page.get_text() + "\n\n"
+            
+            if len(text.strip()) > 100:  # If sufficient text found
+                return text
                 
-            # Fallback to OCR if no text found
-            try:
-                images = convert_from_bytes(
-                    uploaded_file.read(),
-                    dpi=200,
-                    fmt='jpeg',
-                    thread_count=2
-                )
-                return "\n\n".join(pytesseract.image_to_string(img) for img in images)
+            # Fallback to OCR using PyMuPDF's built-in rendering
+            for page in doc:
+                pix = page.get_pixmap(dpi=200)
+                img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                text += pytesseract.image_to_string(img) + "\n\n"
                 
-            except PDFInfoNotInstalledError:
-                st.error("Poppler not installed! Check your apt.txt")
-                return ""
-                
+            return text if text.strip() else "No text extracted"
+            
         except Exception as e:
             st.error(f"Processing failed: {str(e)}")
             return ""
