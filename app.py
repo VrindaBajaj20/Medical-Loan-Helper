@@ -36,19 +36,20 @@ import pytesseract
 pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
 
 # Verify Tesseract installation
-if not os.path.exists(pytesseract.pytesseract.tesseract_cmd):
-    raise RuntimeError(
-        f"Tesseract not found at {pytesseract.pytesseract.tesseract_cmd}. "
-        "Please check your apt.txt configuration."
-    )
+def verify_tesseract():
+    try:
+        test_img = Image.new('RGB', (100, 100), color='white')
+        pytesseract.image_to_string(test_img)
+        return True
+    except Exception as e:
+        st.error(f"Tesseract test failed: {str(e)}")
+        return False
 # Check if model is already installed, if not, install it
 try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
     subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
     nlp = spacy.load("en_core_web_sm")
-
-pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
 
 # Initialize models (dummy implementations that actually work)
 class InsuranceModel:
@@ -332,7 +333,25 @@ class DocumentProcessor:
             st.warning(f"Digital text extraction failed: {str(e)}")
         
         # Fallback to OCR for scanned PDFs using PyMuPDF
+
+                # Fallback to OCR with memory limits
         try:
+            images = convert_from_bytes(
+                file_bytes,
+                dpi=200,
+                thread_count=2,
+                fmt='jpeg',
+                poppler_timeout=30
+            )
+            
+            for img in images:
+                text += pytesseract.image_to_string(img) + "\n\n"
+                
+            return text if text.strip() else "No text extracted"
+        except Exception as e:
+            st.error(f"PDF processing failed: {str(e)}")
+            return ""
+        '''        try:
             with fitz.open(stream=file_bytes, filetype="pdf") as doc:
                 for page in doc:
                     # Render page to image (300 DPI)
@@ -346,7 +365,7 @@ class DocumentProcessor:
             return text
         except Exception as e:
             st.error(f"PDF OCR failed: {str(e)}")
-            return ""
+            return ""'''
     
     @staticmethod
     def clean_text(text: str) -> str:
