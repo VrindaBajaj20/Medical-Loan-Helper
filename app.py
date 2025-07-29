@@ -315,41 +315,35 @@ class MedicalReportProcessor:
     
 #POPPLER_PATH = r"C:\Users\VRINDA\Downloads\Release-23.11.0-0\poppler-23.11.0\Library\bin"
 
+from pdf2image import convert_from_bytes
+from pdf2image.exceptions import PDFInfoNotInstalledError
+
 class DocumentProcessor:
     @staticmethod
     def extract_text(uploaded_file):
-        """Robust text extraction with proper error handling"""
-        text = ""
-        uploaded_file.seek(0)  # Reset file pointer
-        file_bytes = uploaded_file.read()
-        
-        # First try direct text extraction
         try:
-            with fitz.open(stream=file_bytes, filetype="pdf") as doc:
+            # First try direct text extraction with PyMuPDF
+            with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
                 text = "\n".join([page.get_text() for page in doc])
-                if len(text.strip()) > 50:  # If we got substantial text
+                if text.strip():
                     return text
+                
+            # Fallback to OCR if no text found
+            try:
+                images = convert_from_bytes(
+                    uploaded_file.read(),
+                    dpi=200,
+                    fmt='jpeg',
+                    thread_count=2
+                )
+                return "\n\n".join(pytesseract.image_to_string(img) for img in images)
+                
+            except PDFInfoNotInstalledError:
+                st.error("Poppler not installed! Check your apt.txt")
+                return ""
+                
         except Exception as e:
-            st.warning(f"Direct text extraction failed: {str(e)}")
-        
-        # Fallback to OCR with optimized settings
-        try:
-            # Convert PDF to images with system Poppler
-            images = convert_from_bytes(
-                file_bytes,
-                dpi=200,  # Lower resolution for faster processing
-                fmt='jpeg',  # More efficient than PNG
-                thread_count=2,  # Reduce parallel processing
-                poppler_path=None  # Use system Poppler
-            )
-            
-            # Process each page image
-            for img in images:
-                text += pytesseract.image_to_string(img) + "\n\n"
-            
-            return text if text.strip() else "No text could be extracted"
-        except Exception as e:
-            st.error(f"PDF OCR processing failed: {str(e)}")
+            st.error(f"Processing failed: {str(e)}")
             return ""
         '''        try:
             with fitz.open(stream=file_bytes, filetype="pdf") as doc:
