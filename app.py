@@ -318,38 +318,38 @@ class MedicalReportProcessor:
 class DocumentProcessor:
     @staticmethod
     def extract_text(uploaded_file):
-        """Extract text from both scanned and digital PDFs using PyMuPDF only"""
+        """Robust text extraction with proper error handling"""
         text = ""
         uploaded_file.seek(0)  # Reset file pointer
         file_bytes = uploaded_file.read()
         
+        # First try direct text extraction
         try:
-            # Try digital PDF extraction
             with fitz.open(stream=file_bytes, filetype="pdf") as doc:
                 text = "\n".join([page.get_text() for page in doc])
-                if len(text.strip()) > 50:  # Check if extraction successful
+                if len(text.strip()) > 50:  # If we got substantial text
                     return text
         except Exception as e:
-            st.warning(f"Digital text extraction failed: {str(e)}")
+            st.warning(f"Direct text extraction failed: {str(e)}")
         
-        # Fallback to OCR for scanned PDFs using PyMuPDF
-
-                # Fallback to OCR with memory limits
+        # Fallback to OCR with optimized settings
         try:
+            # Convert PDF to images with system Poppler
             images = convert_from_bytes(
                 file_bytes,
-                dpi=200,
-                thread_count=2,
-                fmt='jpeg',
-                poppler_timeout=30
+                dpi=200,  # Lower resolution for faster processing
+                fmt='jpeg',  # More efficient than PNG
+                thread_count=2,  # Reduce parallel processing
+                poppler_path=None  # Use system Poppler
             )
             
+            # Process each page image
             for img in images:
                 text += pytesseract.image_to_string(img) + "\n\n"
-                
-            return text if text.strip() else "No text extracted"
+            
+            return text if text.strip() else "No text could be extracted"
         except Exception as e:
-            st.error(f"PDF processing failed: {str(e)}")
+            st.error(f"PDF OCR processing failed: {str(e)}")
             return ""
         '''        try:
             with fitz.open(stream=file_bytes, filetype="pdf") as doc:
