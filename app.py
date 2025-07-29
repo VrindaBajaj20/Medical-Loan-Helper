@@ -35,6 +35,8 @@ except OSError:
     subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
     nlp = spacy.load("en_core_web_sm")
 
+pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+
 # Initialize models (dummy implementations that actually work)
 class InsuranceModel:
     def __init__(self):
