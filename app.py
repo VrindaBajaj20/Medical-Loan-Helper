@@ -20,7 +20,16 @@ TESSERACT_PATH = r"C:\Program Files\Tesseract-OCR\tesseract.exe"  # Windows exam
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
 
 # Load NLP model
-nlp = spacy.load("en_core_web_sm")
+
+from spacy.cli import download
+
+# Check if the model is installed, otherwise download it
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    print("Downloading 'en_core_web_sm' model...")
+    download("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
 
 # Initialize models (dummy implementations that actually work)
 class InsuranceModel:
