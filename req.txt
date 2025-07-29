@@ -1,0 +1,11 @@
+streamlit
+PyMuPDF
+pytesseract
+pillow
+transformers
+torch
+xgboost
+shap
+matplotlib
+numpy
+scikit-learn
