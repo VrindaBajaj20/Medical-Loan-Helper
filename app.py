@@ -24,11 +24,15 @@ pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
 from spacy.cli import download
 
 # Check if the model is installed, otherwise download it
+import spacy
+import subprocess
+import sys
+
+# Check if model is already installed, if not, install it
 try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
-    print("Downloading 'en_core_web_sm' model...")
-    download("en_core_web_sm")
+    subprocess.check_call([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
     nlp = spacy.load("en_core_web_sm")
 
 # Initialize models (dummy implementations that actually work)
