@@ -277,11 +277,11 @@ class MedicalReportProcessor:
             elif title == "Medical Condition":
                 output += f"- **Diagnosis:** {data.get('diagnosis')}\n"
                 output += f"- **ICD Code:** {data.get('icd_code')}\n"
-                output += f"- **Symptoms:** {', '.join(data.get('symptoms') or 'N/A'}\n"
+                output += f"- **Symptoms:** {', '.join(data.get('symptoms') or ['N/A'])}\n"
             elif title == "Treatment Plan":
                 output += f"- **Plan:** {data.get('plan')}\n"
-                output += f"- **Medications:** {', '.join(data.get('medications') or 'N/A'}\n"
-                output += f"- **Procedures:** {', '.join(data.get('procedures') or 'N/A'}\n"
+                output += f"- **Medications:** {', '.join(data.get('medications') or ['N/A'])}\n"
+                output += f"- **Procedures:** {', '.join(data.get('procedures') or ['N/A'])}\n"
             elif title == "Patient Progress":
                 output += f"- **Initial Condition:** {data.get('initial_condition')}\n"
                 output += f"- **Current Status:** {data.get('current_status')}\n"
@@ -293,7 +293,7 @@ class MedicalReportProcessor:
                 else:
                     output += "\n## Key Clinical Findings\nNo key findings detected.\n"
             elif title == "Timeline and Other Info":
-                output += f"- **Dates mentioned:** {', '.join(data.get('dates') or 'N/A'}\n"
+                output += f"- **Dates mentioned:** {', '.join(data.get('dates') or ['N/A'])}\n"
                 output += f"- **Age:** {data.get('age')}\n"
             output += "\n"
         
